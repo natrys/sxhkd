@@ -25,6 +25,13 @@
 #ifndef SXHKD_HELPERS_H
 #define SXHKD_HELPERS_H
 
+#include <stdbool.h>
+
+#define SOCKET_PATH_TPL  "/tmp/bspwm%s_%i_%i-socket"
+#define SOCKET_ENV_VAR   "BSPWM_SOCKET"
+
+#define FAILURE_MESSAGE  "\x07"
+
 #define LENGTH(x)         (sizeof(x) / sizeof(*x))
 #define MAXLEN            256
 

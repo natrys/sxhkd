@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/select.h>
 #include <sys/types.h>
@@ -35,6 +36,7 @@
 #include <stdbool.h>
 #include "parse.h"
 #include "grab.h"
+#include "bspc.h"
 
 xcb_connection_t *dpy;
 xcb_window_t root;
@@ -234,7 +236,24 @@ void key_button_event(xcb_generic_event_t *evt, uint8_t event_type)
 	if (keysym != XCB_NO_SYMBOL || button != XCB_NONE) {
 		hotkey_t *hk = find_hotkey(keysym, button, modfield, event_type, &replay_event);
 		if (hk != NULL) {
-			run(hk->command, hk->sync);
+			if (strncmp(hk->command, "!bspc ", 6) == 0) {
+				char command[256];
+				memset(command, '\0', sizeof(command));
+				strcpy(command, hk->command);
+
+				char *sub_command = strtok(command, " ");
+				char *argv[32];
+				int argc = 0;
+
+				while(sub_command != NULL) {
+					argv[argc++] = sub_command;
+					sub_command = strtok(NULL, " ");
+				}
+
+				bspc(argc, argv);
+			} else {
+				run(hk->command, hk->sync);
+			}
 			put_status(COMMAND_PREFIX, hk->command);
 		}
 	}
